@@ -57,13 +57,13 @@ body {
   }
 
   .board-menu-btn {
-    @apply flex w-full items-center justify-start gap-3 rounded px-3 py-2 hover:bg-slate-200 disabled:text-slate-500 disabled:hover:bg-inherit disabled:hover:text-slate-500;
+    @apply flex w-full items-center justify-start gap-3 rounded px-3 py-2 hover:bg-gray-200 disabled:text-gray-500 disabled:hover:bg-inherit disabled:hover:text-gray-500;
   }
   .board-settings-form {
     @apply flex flex-col gap-1;
   }
   .board-settings-form-input {
-    @apply max-w-xs rounded border border-slate-300 bg-white px-4 py-1;
+    @apply max-w-xs rounded border border-gray-300 bg-white px-4 py-1;
   }
 
   .unauthorized-page-container {

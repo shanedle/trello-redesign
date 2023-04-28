@@ -5,7 +5,7 @@ const CardBuilder = ({ columnID }: { columnID: string }) => {
 
   if (!board.builder[columnID].state)
     return (
-      <button onClick={() => board.updateBuilder({ [columnID]: { state: true } })} className="trans flex w-full items-center justify-start gap-1 py-2 text-black hover:rounded-md hover:bg-slate-300">
+      <button onClick={() => board.updateBuilder({ [columnID]: { state: true } })} className="trans flex w-full items-center justify-start gap-1 py-2 text-black hover:rounded-md hover:bg-gray-300">
         <p className="bi bi-plus-lg ml-2 flex items-center gap-2">Add a card</p>
       </button>
     );
