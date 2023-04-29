@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { collection, onSnapshot } from "firebase/firestore";
 
 import Layout from "@/components/layouts/layout-static";
-import SearchBar from "@/components/search-bar";
-import BoardGrid from "@/components/board-grid";
-import ProtectedRoute from "@/components/protected-route";
+import SearchBar from "@/components/search-bar/search-bar";
+import BoardGrid from "@/components/board-grid/board-grid";
+import ProtectedRoute from "@/components/protected-route/protected-route";
 
 import { database } from "@/lib/firebase";
 import { useAuth } from "@/lib/use-auth";

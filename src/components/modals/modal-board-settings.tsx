@@ -4,7 +4,7 @@ import Modal from "@/components/modals/modal";
 
 import useBoardStore from "@/lib/store";
 
-const BoardSettings = ({
+const ModalBoardSettings = ({
   state,
   setState,
 }: {
@@ -77,13 +77,13 @@ const BoardSettings = ({
               <button
                 onClick={() => setState("")}
                 type="button"
-                className="btn bg-gray-600 text-white hover:bg-gray-700"
+                className="btn border-2 border-black bg-white text-black hover:bg-gray-100"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="btn bg-primary-600 text-white hover:bg-primary-700"
+                className="btn border-2 border-primary-600 bg-primary-600 text-white hover:border-primary-700 hover:bg-primary-700"
               >
                 Save
               </button>
@@ -94,4 +94,4 @@ const BoardSettings = ({
     );
 };
 
-export default BoardSettings;
+export default ModalBoardSettings;

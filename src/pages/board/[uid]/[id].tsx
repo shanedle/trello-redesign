@@ -2,9 +2,9 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
-import Card from "@/components/card";
-import CardBuilder from "@/components/card-builder";
-import Navbar from "@/components/navbar/boards";
+import Card from "@/components/card/card";
+import CardBuilder from "@/components/card-builder/card-builder";
+import Navbar from "@/components/navbars/navbar-boards";
 
 import { useAuth } from "@/lib/use-auth";
 import useBoardStore from "@/lib/store";
@@ -45,7 +45,7 @@ const Board = () => {
                           snapshot.isDraggingOver
                             ? "bg-gray-200/70"
                             : "bg-white"
-                        } flex w-full shrink-0 flex-col gap-3 rounded-xl p-3 transition duration-300 sm:w-1/3`}
+                        } flex w-full shrink-0 flex-col gap-3 rounded-xl p-3 shadow-md transition duration-300 sm:w-1/3`}
                       >
                         <header className="flex items-center justify-between">
                           <h1 className="ml-1 text-2xl font-semibold">
@@ -53,7 +53,7 @@ const Board = () => {
                           </h1>
                           <button
                             onClick={() => board.deleteAllColumnCards(columnID)}
-                            className={`rounded bg-white px-3 py-1 hover:bg-gray-300  ${
+                            className={`rounded bg-white px-3 py-1 hover:bg-gray-200  ${
                               column.cards.length > 2
                                 ? "opacity-100"
                                 : "opacity-0"
@@ -81,7 +81,7 @@ const Board = () => {
                                       ref={provided.innerRef}
                                       {...provided.draggableProps}
                                       {...provided.dragHandleProps}
-                                      className="group flex items-center justify-between overflow-hidden rounded-xl border bg-white p-3 px-4 shadow-md hover:bg-gray-100"
+                                      className="group flex items-center justify-between overflow-hidden rounded-xl border bg-white p-3 px-4 shadow-sm hover:bg-gray-100"
                                     >
                                       <Card
                                         card={card}

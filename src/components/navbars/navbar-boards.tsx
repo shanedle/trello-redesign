@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { useState } from "react";
 
-import BoardSettings from "@/components/modals/board-settings";
-import BoardDelete from "@/components/modals/board-delete";
+import ModalBoardSettings from "@/components/modals/modal-board-settings";
+import ModalBoardDelete from "@/components/modals/modal-delete-board";
 
 import useBoardStore from "@/lib/store";
 import { useAuth } from "@/lib/use-auth";
@@ -44,8 +44,8 @@ const Navbar = () => {
           </div>
         </section>
 
-        <BoardSettings state={modalType} setState={setModalType} />
-        <BoardDelete state={modalType} setState={setModalType} />
+        <ModalBoardSettings state={modalType} setState={setModalType} />
+        <ModalBoardDelete state={modalType} setState={setModalType} />
 
         {user && (
           <div
