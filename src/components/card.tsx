@@ -11,16 +11,21 @@ interface Props {
 const Card = ({ card, update, remove }: Props) => {
   const [edit, setEdit] = useState(false);
   const [name, setName] = useState(card.name);
+  const [showIcons, setShowIcons] = useState(false);
+
   return (
-    <div className="group flex w-full items-center justify-between ">
-      <div className="flex w-full items-center justify-start gap-2 ">
-        <i className="bi bi-grip-vertical text-xl text-gray-500"></i>
+    <div
+      className="group flex w-full items-center justify-between"
+      onMouseEnter={() => setShowIcons(true)}
+      onMouseLeave={() => setShowIcons(false)}
+    >
+      <div className="flex w-full items-center justify-start gap-2">
         {edit ? (
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full animate-pulse bg-inherit  "
+            className="w-full animate-pulse bg-inherit"
           />
         ) : (
           <p className="" style={{ wordBreak: "break-word" }}>
@@ -49,12 +54,14 @@ const Card = ({ card, update, remove }: Props) => {
         ) : (
           <>
             <button
-              onClick={() => setEdit(!edit)}
-              className="bi bi-pen trans text-gray-600 group-hover:text-yellow-600 "
+              onClick={() => setEdit(true)}
+              className="bi bi-pen trans text-gray-600 hover:text-yellow-600"
+              style={{ display: showIcons ? "block" : "none" }}
             ></button>
             <button
               onClick={remove}
-              className="bi bi-trash trans text-gray-600  group-hover:text-red-600 "
+              className="bi bi-trash trans text-gray-600 hover:text-red-600"
+              style={{ display: showIcons ? "block" : "none" }}
             ></button>
           </>
         )}
