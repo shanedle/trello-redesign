@@ -15,7 +15,9 @@ const Navbar = () => {
     <nav className="w-full bg-white p-5">
       <div className="container mx-auto flex items-center justify-between gap-5 text-xl">
         <Link href={user ? "/board" : "/"}>
-          <button className="mr-10 text-2xl font-extrabold text-blue-900">Trello</button>
+          <button className="mr-10 text-2xl font-extrabold text-blue-900">
+            Trello
+          </button>
         </Link>
         {!user ? (
           <Link href="/login">

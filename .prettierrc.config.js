@@ -1,4 +1,19 @@
+const prettierTailwind = require("prettier-plugin-tailwindcss");
+
 module.exports = {
-  plugins: [require("prettier-plugin-tailwindcss")],
-  printWidth: 200,
-}
+  default: {
+    printWidth: 80,
+    tabWidth: 2,
+    useTabs: false,
+    semi: true,
+    singleQuote: false,
+    trailingComma: "none",
+    bracketSpacing: true,
+    jsxBracketSameLine: false,
+    arrowParens: "avoid",
+  },
+  tailwind: {
+    plugins: [prettierTailwind],
+    printWidth: 200,
+  },
+};

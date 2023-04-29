@@ -18,7 +18,13 @@ const Login = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const [credentials, updateCredentials] = useReducer((prev: Credentials, next: { [key: string]: string }) => ({ ...prev, ...next }), { email: "", password: "" });
+  const [credentials, updateCredentials] = useReducer(
+    (prev: Credentials, next: { [key: string]: string }) => ({
+      ...prev,
+      ...next,
+    }),
+    { email: "", password: "" }
+  );
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -37,16 +43,35 @@ const Login = () => {
       <main className="auth-page">
         <form onSubmit={handleSubmit} className="auth-form">
           <header className="auth-form-header">Log in to Trello</header>
-          <input type="email" className="auth-form-input" value={credentials.email} onChange={(event) => updateCredentials({ email: event.target.value })} placeholder="Enter email" required />
+          <input
+            type="email"
+            className="auth-form-input"
+            value={credentials.email}
+            onChange={(event) =>
+              updateCredentials({ email: event.target.value })
+            }
+            placeholder="Enter email"
+            required
+          />
           <input
             type="password"
             className="auth-form-input"
             value={credentials.password}
-            onChange={(event) => updateCredentials({ password: event.target.value })}
+            onChange={(event) =>
+              updateCredentials({ password: event.target.value })
+            }
             placeholder="Enter password"
             required
           />
-          <button type="submit" className="auth-form-btn" disabled={loading || !credentials.email.length || !credentials.password.length}>
+          <button
+            type="submit"
+            className="auth-form-btn"
+            disabled={
+              loading ||
+              !credentials.email.length ||
+              !credentials.password.length
+            }
+          >
             {!loading ? "Sign In" : <p className="bi bi-arrow-clockwise"></p>}
           </button>
 

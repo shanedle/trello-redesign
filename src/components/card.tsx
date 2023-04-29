@@ -16,7 +16,12 @@ const Card = ({ card, update, remove }: Props) => {
       <div className="flex w-full items-center justify-start gap-2 ">
         <i className="bi bi-grip-vertical text-xl text-gray-500"></i>
         {edit ? (
-          <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full animate-pulse bg-inherit  " />
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full animate-pulse bg-inherit  "
+          />
         ) : (
           <p className="" style={{ wordBreak: "break-word" }}>
             {card.name}
@@ -43,8 +48,14 @@ const Card = ({ card, update, remove }: Props) => {
           </>
         ) : (
           <>
-            <button onClick={() => setEdit(!edit)} className="bi bi-pen trans text-gray-600 group-hover:text-yellow-600 "></button>
-            <button onClick={remove} className="bi bi-trash trans text-gray-600  group-hover:text-red-600 "></button>
+            <button
+              onClick={() => setEdit(!edit)}
+              className="bi bi-pen trans text-gray-600 group-hover:text-yellow-600 "
+            ></button>
+            <button
+              onClick={remove}
+              className="bi bi-trash trans text-gray-600  group-hover:text-red-600 "
+            ></button>
           </>
         )}
       </div>

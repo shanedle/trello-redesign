@@ -4,11 +4,20 @@ import Modal from "@/components/modals/modal";
 
 import useBoardStore from "@/lib/store";
 
-const BoardSettings = ({ state, setState }: { state: string; setState: Dispatch<SetStateAction<string>> }) => {
+const BoardSettings = ({
+  state,
+  setState,
+}: {
+  state: string;
+  setState: Dispatch<SetStateAction<string>>;
+}) => {
   const board = useBoardStore((state) => state.board);
   const updateBoard = useBoardStore((state) => state.updateBoard);
 
-  const [draft, setDraft] = useReducer((prev: any, next: any) => ({ ...prev, ...next }), { ...board });
+  const [draft, setDraft] = useReducer(
+    (prev: any, next: any) => ({ ...prev, ...next }),
+    { ...board }
+  );
 
   const handleSave = (event: FormEvent) => {
     event.preventDefault();
@@ -30,7 +39,14 @@ const BoardSettings = ({ state, setState }: { state: string; setState: Dispatch<
           <form onSubmit={handleSave} className="flex flex-col gap-5 p-3">
             <div className="board-settings-form">
               <label>Rename board</label>
-              <input type="text" maxLength={15} value={draft.name} onChange={(e) => setDraft({ name: e.target.value })} className="board-settings-form-input" placeholder="Board name" />
+              <input
+                type="text"
+                maxLength={15}
+                value={draft.name}
+                onChange={(e) => setDraft({ name: e.target.value })}
+                className="board-settings-form-input"
+                placeholder="Board name"
+              />
             </div>
 
             <div className="board-settings-form">
@@ -45,16 +61,30 @@ const BoardSettings = ({ state, setState }: { state: string; setState: Dispatch<
               />
             </div>
 
-            <button onClick={() => setDraft({ public: !draft.public })} type="button" className="mt-4 flex gap-2">
-              Security: <span className="font-semibold">{draft.public ? "Public" : "Private"}</span>
+            <button
+              onClick={() => setDraft({ public: !draft.public })}
+              type="button"
+              className="mt-4 flex gap-2"
+            >
+              Security:{" "}
+              <span className="font-semibold">
+                {draft.public ? "Public" : "Private"}
+              </span>
               <i className={`bi bi-${draft.public ? "unlock" : "lock"}`} />
             </button>
 
             <div className="flex w-full items-center justify-end gap-3">
-              <button onClick={() => setState("")} type="button" className="btn bg-gray-600 text-white hover:bg-gray-700">
+              <button
+                onClick={() => setState("")}
+                type="button"
+                className="btn bg-gray-600 text-white hover:bg-gray-700"
+              >
                 Cancel
               </button>
-              <button type="submit" className="btn bg-primary-600 text-white hover:bg-primary-700">
+              <button
+                type="submit"
+                className="btn bg-primary-600 text-white hover:bg-primary-700"
+              >
                 Save
               </button>
             </div>

@@ -1,6 +1,17 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import dayjs from "dayjs";
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, User } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  User,
+} from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 
 import { auth, database } from "@/lib/firebase";
@@ -33,9 +44,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signUp = async (name: string, email: string, password: string) => {
     try {
-      const response = await createUserWithEmailAndPassword(auth, email, password);
-      await updateProfile(response.user, { displayName: name, photoURL: "https://64.media.tumblr.com/0d27c049c7d42f394dbc431214df71ba/tumblr_n2wxzd4y7w1rpwm80o1_250.jpg" });
-      await setDoc(doc(database, "users", response.user.uid), { name: name, createdAt: dayjs().format() });
+      const response = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      await updateProfile(response.user, {
+        displayName: name,
+        photoURL:
+          "https://64.media.tumblr.com/0d27c049c7d42f394dbc431214df71ba/tumblr_n2wxzd4y7w1rpwm80o1_250.jpg",
+      });
+      await setDoc(doc(database, "users", response.user.uid), {
+        name: name,
+        createdAt: dayjs().format(),
+      });
     } catch (error) {
       alert(error);
     }
@@ -57,11 +79,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     signUp,
     signOut,
   };
-  return <AuthContext.Provider value={contextValues}>{!loading && children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={contextValues}>
+      {!loading && children}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) throw Error("Context must be used within Provider");
+  if (context === undefined)
+    throw Error("Context must be used within Provider");
   return context;
 };

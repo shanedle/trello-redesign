@@ -1,6 +1,17 @@
 import { create } from "zustand";
 import { DropResult } from "react-beautiful-dnd";
-import { collection, DocumentReference, DocumentData, deleteDoc, doc, getDoc, getDocs, setDoc, updateDoc, Query } from "firebase/firestore";
+import {
+  collection,
+  DocumentReference,
+  DocumentData,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  updateDoc,
+  Query,
+} from "firebase/firestore";
 import { uuidv4 as uuid } from "@firebase/util";
 
 import { database } from "@/lib/firebase";
@@ -55,10 +66,17 @@ const useBoardStore = create<Store>((set, get) => ({
   boardID: "",
   userID: null,
 
-  boardDocRef: (pathSegments?: string[]) => doc(database, get().path, ...(pathSegments?.length ? pathSegments : [])),
-  boardCollectionRef: (pathSegments?: string[]) => collection(database, get().path, ...(pathSegments?.length ? pathSegments : [])),
+  boardDocRef: (pathSegments?: string[]) =>
+    doc(database, get().path, ...(pathSegments?.length ? pathSegments : [])),
+  boardCollectionRef: (pathSegments?: string[]) =>
+    collection(
+      database,
+      get().path,
+      ...(pathSegments?.length ? pathSegments : [])
+    ),
 
-  updateBuilder: (payload: any) => set((state) => ({ builder: { ...state.builder, ...payload } })),
+  updateBuilder: (payload: any) =>
+    set((state) => ({ builder: { ...state.builder, ...payload } })),
   setStatus: (payload: number) => set({ status: payload }),
 
   addCard: (column: string) => {
@@ -80,14 +98,20 @@ const useBoardStore = create<Store>((set, get) => ({
   },
 
   editCard: (id: string, name: string) => {
-    set({ cards: { ...get().cards, [id]: { ...get().cards[id], name: name } } });
+    set({
+      cards: { ...get().cards, [id]: { ...get().cards[id], name: name } },
+    });
     updateDoc(get().boardDocRef(["cards", id]), { name: name });
   },
 
   deleteCard: async (columnID: string, cardID: string) => {
-    const columnCards = get().columns[columnID].cards.filter((card) => card !== cardID);
+    const columnCards = get().columns[columnID].cards.filter(
+      (card) => card !== cardID
+    );
     await deleteDoc(get().boardDocRef(["cards", cardID]));
-    await updateDoc(get().boardDocRef(["columns", columnID]), { cards: columnCards });
+    await updateDoc(get().boardDocRef(["columns", columnID]), {
+      cards: columnCards,
+    });
 
     set((state) => ({
       columns: {
@@ -134,9 +158,14 @@ const useBoardStore = create<Store>((set, get) => ({
     const docSnap = await getDoc(get().boardDocRef());
 
     if (!docSnap.exists()) return set({ status: 404 });
-    if (!docSnap.data().public && get().userID !== get().ownerID) return set({ status: 401 });
+    if (!docSnap.data().public && get().userID !== get().ownerID)
+      return set({ status: 401 });
 
-    set({ order: docSnap.data().order, board: docSnap.data() as Board, status: 200 });
+    set({
+      order: docSnap.data().order,
+      board: docSnap.data() as Board,
+      status: 200,
+    });
     // console.log("%cFetch: Board", "color: green", docSnap.data())
   },
 
@@ -170,7 +199,12 @@ const useBoardStore = create<Store>((set, get) => ({
 
   initializeBoard: (ownerID: string, boardID: string, userID: string) => {
     if (!ownerID || !boardID) return set({ status: 404 });
-    set({ ownerID, boardID, userID, path: `users/${ownerID}/boards/${boardID}` });
+    set({
+      ownerID,
+      boardID,
+      userID,
+      path: `users/${ownerID}/boards/${boardID}`,
+    });
     get().fetchBoard();
     get().fetchCards();
     get().fetchColumns();
@@ -202,7 +236,9 @@ const useBoardStore = create<Store>((set, get) => ({
       });
     } else {
       const sourceCards = [...get().columns[source.droppableId].cards];
-      const destinationCards = [...get().columns[destination.droppableId].cards];
+      const destinationCards = [
+        ...get().columns[destination.droppableId].cards,
+      ];
 
       sourceCards.splice(source.index, 1);
       destinationCards.splice(destination.index, 0, result.draggableId);

@@ -5,7 +5,13 @@ import Modal from "@/components/modals/modal";
 
 import useBoardStore from "@/lib/store";
 
-const BoardDelete = ({ state, setState }: { state: string; setState: Dispatch<SetStateAction<string>> }) => {
+const BoardDelete = ({
+  state,
+  setState,
+}: {
+  state: string;
+  setState: Dispatch<SetStateAction<string>>;
+}) => {
   const deleteBoard = useBoardStore((state) => state.deleteBoard);
   const router = useRouter();
 
@@ -19,10 +25,17 @@ const BoardDelete = ({ state, setState }: { state: string; setState: Dispatch<Se
             <button onClick={() => setState("")} className="bi bi-x-lg" />
           </header>
 
-          <p className="text-justify text-base md:text-lg">Are you sure you want to delete this board? This action is irreversible, and all associated data will be permanently removed. </p>
+          <p className="text-justify text-base md:text-lg">
+            Are you sure you want to delete this board? This action is
+            irreversible, and all associated data will be permanently removed.{" "}
+          </p>
 
           <div className=" flex w-full items-center justify-end gap-3">
-            <button onClick={() => setState("")} type="button" className="btn bg-gray-600 text-white hover:bg-gray-700">
+            <button
+              onClick={() => setState("")}
+              type="button"
+              className="btn bg-gray-600 text-white hover:bg-gray-700"
+            >
               Cancel
             </button>
             <button

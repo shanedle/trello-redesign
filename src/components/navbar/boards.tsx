@@ -48,16 +48,31 @@ const Navbar = () => {
         <BoardDelete state={modalType} setState={setModalType} />
 
         {user && (
-          <div onClick={toggleMenu} className="bi bi-gear relative cursor-pointer text-2xl">
+          <div
+            onClick={toggleMenu}
+            className="bi bi-gear relative cursor-pointer text-2xl"
+          >
             {menuOpen && (
               <menu className="absolute right-0 top-8 flex flex-col items-start gap-1 whitespace-nowrap rounded-b-lg bg-white p-3 text-base shadow-md">
-                <button onClick={() => openModal("settings")} className="bi bi-pen board-menu-btn" type="button" disabled={user.uid !== ownerID}>
+                <button
+                  onClick={() => openModal("settings")}
+                  className="bi bi-pen board-menu-btn"
+                  type="button"
+                  disabled={user.uid !== ownerID}
+                >
                   Board settings
                 </button>
-                <button onClick={() => openModal("delete")} className="bi bi-trash3 board-menu-btn hover:text-red-400" disabled={user.uid !== ownerID}>
+                <button
+                  onClick={() => openModal("delete")}
+                  className="bi bi-trash3 board-menu-btn hover:text-red-400"
+                  disabled={user.uid !== ownerID}
+                >
                   Delete this board
                 </button>
-                <button onClick={signOut} className="bi bi-box-arrow-right board-menu-btn">
+                <button
+                  onClick={signOut}
+                  className="bi bi-box-arrow-right board-menu-btn"
+                >
                   Log out
                 </button>
               </menu>

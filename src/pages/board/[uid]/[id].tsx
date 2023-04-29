@@ -40,30 +40,62 @@ const Board = () => {
                 return (
                   <Droppable droppableId={columnID} key={columnID}>
                     {(provided, snapshot) => (
-                      <div className={`${snapshot.isDraggingOver ? "bg-gray-200/70" : "bg-white"} flex w-full shrink-0 flex-col gap-3 rounded-xl p-3 transition duration-300 sm:w-1/3`}>
+                      <div
+                        className={`${
+                          snapshot.isDraggingOver
+                            ? "bg-gray-200/70"
+                            : "bg-white"
+                        } flex w-full shrink-0 flex-col gap-3 rounded-xl p-3 transition duration-300 sm:w-1/3`}
+                      >
                         <header className="flex items-center justify-between">
-                          <h1 className="ml-1 text-2xl font-semibold">{column.name}</h1>
+                          <h1 className="ml-1 text-2xl font-semibold">
+                            {column.name}
+                          </h1>
                           <button
                             onClick={() => board.deleteAllColumnCards(columnID)}
-                            className={`rounded bg-white px-3 py-1 hover:bg-gray-300  ${column.cards.length > 2 ? "opacity-100" : "opacity-0"}`}
+                            className={`rounded bg-white px-3 py-1 hover:bg-gray-300  ${
+                              column.cards.length > 2
+                                ? "opacity-100"
+                                : "opacity-0"
+                            }`}
                           >
                             Clear all
                           </button>
                         </header>
-                        <div {...provided.droppableProps} ref={provided.innerRef} className="flex flex-col gap-3">
+                        <div
+                          {...provided.droppableProps}
+                          ref={provided.innerRef}
+                          className="flex flex-col gap-3"
+                        >
                           {column.cards.map((id, index) => {
                             const card = board.cards[id as keyof Cards];
                             if (card)
                               return (
-                                <Draggable key={id} draggableId={id} index={index}>
+                                <Draggable
+                                  key={id}
+                                  draggableId={id}
+                                  index={index}
+                                >
                                   {(provided, snapshot) => (
                                     <div
                                       ref={provided.innerRef}
                                       {...provided.draggableProps}
                                       {...provided.dragHandleProps}
-                                      className={`${snapshot.isDragging ? "bg-gray-300" : "bg-white"} group flex items-center justify-between overflow-hidden rounded-xl p-3 px-4 hover:bg-gray-300`}
+                                      className={`${
+                                        snapshot.isDragging
+                                          ? "bg-gray-300"
+                                          : "bg-white"
+                                      } group flex items-center justify-between overflow-hidden rounded-xl p-3 px-4 hover:bg-gray-300`}
                                     >
-                                      <Card card={card} update={(name) => board.editCard(id, name)} remove={() => board.deleteCard(columnID, id)} />
+                                      <Card
+                                        card={card}
+                                        update={(name) =>
+                                          board.editCard(id, name)
+                                        }
+                                        remove={() =>
+                                          board.deleteCard(columnID, id)
+                                        }
+                                      />
                                     </div>
                                   )}
                                 </Draggable>

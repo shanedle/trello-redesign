@@ -19,11 +19,17 @@ const Register = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const [credentials, updateCredentials] = useReducer((prev: Credentials, next: { [key: string]: string }) => ({ ...prev, ...next }), {
-    name: "",
-    email: "",
-    password: "",
-  });
+  const [credentials, updateCredentials] = useReducer(
+    (prev: Credentials, next: { [key: string]: string }) => ({
+      ...prev,
+      ...next,
+    }),
+    {
+      name: "",
+      email: "",
+      password: "",
+    }
+  );
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -46,26 +52,50 @@ const Register = () => {
             type="name"
             className="auth-form-input"
             value={credentials.name}
-            onChange={(event) => updateCredentials({ name: event.target.value })}
+            onChange={(event) =>
+              updateCredentials({ name: event.target.value })
+            }
             placeholder="Enter name"
             maxLength={15}
             required
           />
-          <input type="email" className="auth-form-input" value={credentials.email} onChange={(event) => updateCredentials({ email: event.target.value })} placeholder="Enter email" required />
+          <input
+            type="email"
+            className="auth-form-input"
+            value={credentials.email}
+            onChange={(event) =>
+              updateCredentials({ email: event.target.value })
+            }
+            placeholder="Enter email"
+            required
+          />
           <input
             type="password"
             className="auth-form-input"
             value={credentials.password}
-            onChange={(event) => updateCredentials({ password: event.target.value })}
+            onChange={(event) =>
+              updateCredentials({ password: event.target.value })
+            }
             placeholder="Enter password"
             required
           />
-          <button type="submit" className="auth-form-btn" disabled={loading || !credentials.name.length || !credentials.email.length || !credentials.password.length}>
+          <button
+            type="submit"
+            className="auth-form-btn"
+            disabled={
+              loading ||
+              !credentials.name.length ||
+              !credentials.email.length ||
+              !credentials.password.length
+            }
+          >
             {!loading ? "Submit" : <p className="bi bi-arrow-clockwise"></p>}
           </button>
 
           <Link href={"/login"}>
-            <button className="auth-form-link">Already have an account? Log In</button>
+            <button className="auth-form-link">
+              Already have an account? Log In
+            </button>
           </Link>
         </form>
       </main>

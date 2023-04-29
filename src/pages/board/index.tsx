@@ -24,7 +24,8 @@ const Index = () => {
       snapshot.forEach((doc) => {
         const data = { id: doc.id, ...doc.data() };
         setBoards((prev: Board[]) => {
-          if (prev.find((board) => board.id === data.id)) return [...prev] as Board[];
+          if (prev.find((board) => board.id === data.id))
+            return [...prev] as Board[];
           else return [...prev, data] as Board[];
         });
       });
