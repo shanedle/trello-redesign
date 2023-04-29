@@ -76,16 +76,12 @@ const Board = () => {
                                   draggableId={id}
                                   index={index}
                                 >
-                                  {(provided, snapshot) => (
+                                  {(provided) => (
                                     <div
                                       ref={provided.innerRef}
                                       {...provided.draggableProps}
                                       {...provided.dragHandleProps}
-                                      className={`${
-                                        snapshot.isDragging
-                                          ? "bg-gray-300"
-                                          : "bg-white"
-                                      } group flex items-center justify-between overflow-hidden rounded-xl p-3 px-4 hover:bg-gray-300`}
+                                      className="group flex items-center justify-between overflow-hidden rounded-xl border bg-white p-3 px-4 shadow-md hover:bg-gray-100"
                                     >
                                       <Card
                                         card={card}
