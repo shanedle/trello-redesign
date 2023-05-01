@@ -1,4 +1,4 @@
-# Trello Redesign with Next.js, Firebase, and Tailwind CSS
+# Trello Redesign
 This project is a redesign of the popular productivity app Trello, built using Next.js, Firebase, and Tailwind CSS. The goal of this project is to create a more modern and visually appealing version of Trello that is easy to use and includes real-time updates.
 
 ## Features
@@ -15,7 +15,6 @@ This project is a redesign of the popular productivity app Trello, built using N
 
 ## Technologies Used
 - [Next.js:](https://nextjs.org/docs) a popular framework for building server-side rendered React applications
-- [TypeScript:](https://www.typescriptlang.org/docs/) a statically typed language that helps catch errors before you even run your code
 - [Firebase:](https://firebase.google.com/docs) a platform for building web and mobile applications without server-side programming
 - [Tailwind CSS:](https://tailwindcss.com/docs) a utility-first CSS framework for quickly styling your applications
 
