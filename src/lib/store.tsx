@@ -166,7 +166,6 @@ const useBoardStore = create<Store>((set, get) => ({
       board: docSnap.data() as Board,
       status: 200,
     });
-    // console.log("%cFetch: Board", "color: green", docSnap.data())
   },
 
   fetchColumns: async () => {
@@ -182,7 +181,6 @@ const useBoardStore = create<Store>((set, get) => ({
     });
 
     set({ columns: snapColumns as Columns, builder });
-    // console.log("%cFetch: Columns", "color: green", snapColumns)
   },
 
   fetchCards: async () => {
@@ -194,7 +192,6 @@ const useBoardStore = create<Store>((set, get) => ({
     });
 
     set({ cards: snapCards as Cards });
-    // console.log("%cFetch: Cards", "color: green", snapCards)
   },
 
   initializeBoard: (ownerID: string, boardID: string, userID: string) => {
@@ -211,9 +208,6 @@ const useBoardStore = create<Store>((set, get) => ({
   },
 
   DragAndDrop: (result: DropResult) => {
-    // console.log("%cEvent: Drag and Drop", "color: yellow", result)
-    // console.time()
-
     if (!result.destination) return;
     const { source, destination } = result;
 
@@ -263,7 +257,6 @@ const useBoardStore = create<Store>((set, get) => ({
         cards: destinationCards,
       });
     }
-    // console.timeEnd()
   },
 }));
 

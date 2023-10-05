@@ -1,4 +1,4 @@
-import { FormEvent, useReducer, useState } from "react";
+import { FormEvent, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -6,37 +6,24 @@ import Layout from "@/components/layouts/layout-screen";
 
 import { useAuth } from "@/lib/use-auth";
 
-interface Credentials {
-  email: string;
-  password: string;
-}
-
 const Login = () => {
   const router = useRouter();
 
-  const { user, signIn } = useAuth();
+  const { user, signIn, loading } = useAuth();
 
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const [credentials, updateCredentials] = useReducer(
-    (prev: Credentials, next: { [key: string]: string }) => ({
-      ...prev,
-      ...next,
-    }),
-    { email: "", password: "" }
-  );
+  useEffect(() => {
+    if (user) {
+      router.push("/board");
+    }
+  }, [user]);
 
-  const handleSubmit = (event: FormEvent) => {
+  const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    setLoading(true);
-    signIn(credentials.email, credentials.password);
-    setLoading(false);
+    await signIn(email, password);
   };
-
-  if (user) {
-    router.push("/board");
-    return null;
-  }
 
   return (
     <Layout>
@@ -46,37 +33,29 @@ const Login = () => {
           <input
             type="email"
             className="auth-form-input"
-            value={credentials.email}
-            onChange={(event) =>
-              updateCredentials({ email: event.target.value })
-            }
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
             placeholder="Enter email"
             required
           />
           <input
             type="password"
             className="auth-form-input"
-            value={credentials.password}
-            onChange={(event) =>
-              updateCredentials({ password: event.target.value })
-            }
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
             placeholder="Enter password"
             required
           />
           <button
             type="submit"
             className="auth-form-btn"
-            disabled={
-              loading ||
-              !credentials.email.length ||
-              !credentials.password.length
-            }
+            disabled={loading || !email.length || !password.length}
           >
             {!loading ? "Sign In" : <p className="bi bi-arrow-clockwise"></p>}
           </button>
 
           <Link href={"/register"}>
-            <button className="auth-form-link">Sign up for an account</button>
+            <a className="auth-form-link">Sign up for an account</a>
           </Link>
         </form>
       </main>

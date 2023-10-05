@@ -15,7 +15,7 @@ const Landing = () => {
     if (user) {
       router.push("/board");
     }
-  }, [router]);
+  }, [user]);
 
   return (
     <Layout>

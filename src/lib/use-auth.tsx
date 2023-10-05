@@ -18,48 +18,41 @@ import { auth, database } from "@/lib/firebase";
 
 interface Context {
   user: User | null;
-  signIn: (email: string, password: string) => void;
-  signUp: (name: string, email: string, password: string) => void;
+  loading: boolean;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (name: string, email: string, password: string) => Promise<void>;
   signOut: () => void;
 }
 
-const AuthContext = createContext<Context>({
-  user: null,
-  signIn: (email: string, password: string) => {},
-  signUp: (name: string, email: string, password: string) => {},
-  signOut: () => {},
-});
+const AuthContext = createContext<Context | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   const signIn = async (email: string, password: string) => {
+    setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
-      alert(error);
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const signUp = async (name: string, email: string, password: string) => {
+    setLoading(true);
     try {
-      const response = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      await updateProfile(response.user, {
-        displayName: name,
-        photoURL:
-          "https://64.media.tumblr.com/0d27c049c7d42f394dbc431214df71ba/tumblr_n2wxzd4y7w1rpwm80o1_250.jpg",
-      });
-      await setDoc(doc(database, "users", response.user.uid), {
-        name: name,
-        createdAt: dayjs().format(),
-      });
+      await createUserWithEmailAndPassword(auth, email, password);
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        await updateProfile(currentUser, { displayName: name });
+      }
+      setLoading(false);
     } catch (error) {
-      alert(error);
+      console.error(error);
+      setLoading(false);
     }
   };
 
@@ -75,13 +68,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const contextValues = {
     user,
+    loading,
     signIn,
     signUp,
     signOut,
   };
   return (
     <AuthContext.Provider value={contextValues}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 };
@@ -89,6 +83,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined)
-    throw Error("Context must be used within Provider");
+    throw Error("useAuth must be used within an AuthProvider!");
   return context;
 };
