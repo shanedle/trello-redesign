@@ -15,10 +15,10 @@ const Login = () => {
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    if (user) {
+    if (typeof window !== "undefined" && user) {
       router.push("/board");
     }
-  }, [user]);
+  }, [user, router]);
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();

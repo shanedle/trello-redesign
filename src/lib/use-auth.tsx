@@ -5,16 +5,13 @@ import {
   useEffect,
   ReactNode,
 } from "react";
-import dayjs from "dayjs";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   updateProfile,
   User,
 } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
-
-import { auth, database } from "@/lib/firebase";
+import { auth } from "@/lib/firebase";
 
 interface Context {
   user: User | null;
@@ -59,11 +56,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = () => auth.signOut();
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user: User | null) => {
-      setUser(user);
-      setLoading(false);
-    });
-    return unsubscribe;
+    // Check that the window object is defined to make sure this code runs on the client side
+    if (typeof window !== "undefined") {
+      const unsubscribe = auth.onAuthStateChanged((user: User | null) => {
+        setUser(user);
+        setLoading(false);
+      });
+      return unsubscribe;
+    }
+    // If window is undefined, do nothing
+    return () => {};
   }, []);
 
   const contextValues = {

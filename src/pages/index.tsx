@@ -12,10 +12,10 @@ const Landing = () => {
   const { user } = useAuth();
 
   useEffect(() => {
-    if (user) {
+    if (typeof window !== "undefined" && user) {
       router.push("/board");
     }
-  }, [user]);
+  }, [user, router]);
 
   return (
     <Layout>
