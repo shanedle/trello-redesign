@@ -33,6 +33,7 @@ type State = {
   ownerID: string;
   boardID: string;
   userID: string | null;
+  isLoading: boolean;
 };
 
 type Actions = {
@@ -49,7 +50,11 @@ type Actions = {
   fetchBoard: () => Promise<void>;
   fetchCards: () => Promise<void>;
   fetchColumns: () => Promise<void>;
-  initializeBoard: (ownerID: string, boardID: string, userID: string) => void;
+  initializeBoard: (
+    ownerID: string,
+    boardID: string,
+    userID: string
+  ) => Promise<void>;
   DragAndDrop: (event: DragEndEvent) => void;
 };
 
@@ -66,6 +71,7 @@ const useBoardStore = create<Store>((set, get) => ({
   ownerID: "",
   boardID: "",
   userID: null,
+  isLoading: false,
 
   boardDocRef: (pathSegments?: string[]) =>
     doc(database, get().path, ...(pathSegments?.length ? pathSegments : [])),
@@ -172,56 +178,88 @@ const useBoardStore = create<Store>((set, get) => ({
   },
 
   fetchBoard: async () => {
-    const docSnap = await getDoc(get().boardDocRef());
+    try {
+      const docSnap = await getDoc(get().boardDocRef());
 
-    if (!docSnap.exists()) return set({ status: 404 });
-    if (!docSnap.data().public && get().userID !== get().ownerID)
-      return set({ status: 401 });
+      if (!docSnap.exists()) return set({ status: 404 });
+      if (!docSnap.data().public && get().userID !== get().ownerID)
+        return set({ status: 401 });
 
-    set({
-      order: docSnap.data().order,
-      board: docSnap.data() as Board,
-      status: 200,
-    });
+      set({
+        order: docSnap.data().order,
+        board: docSnap.data() as Board,
+        status: 200,
+      });
+    } catch (error) {
+      console.error("Error fetching board:", error);
+      set({ status: 500 });
+    }
   },
 
   fetchColumns: async () => {
-    const snapshot = await getDocs(get().boardCollectionRef(["columns"]));
-    const snapColumns: Snapshot = {};
-    const builder: Builder = {};
+    try {
+      const snapshot = await getDocs(get().boardCollectionRef(["columns"]));
+      const snapColumns: Snapshot = {};
+      const builder: Builder = {};
 
-    snapshot.forEach((column) => {
-      if (column.exists()) {
-        snapColumns[column.id] = column.data();
-        builder[column.id] = { state: false, value: "" };
-      }
-    });
+      snapshot.forEach((column) => {
+        if (column.exists()) {
+          snapColumns[column.id] = column.data();
+          builder[column.id] = { state: false, value: "" };
+        }
+      });
 
-    set({ columns: snapColumns as Columns, builder });
+      set({ columns: snapColumns as Columns, builder });
+    } catch (error) {
+      console.error("Error fetching columns:", error);
+      set({ status: 500 });
+    }
   },
 
   fetchCards: async () => {
-    const snapshotCards = await getDocs(get().boardCollectionRef(["cards"]));
-    const snapCards: Snapshot = {};
+    try {
+      const snapshotCards = await getDocs(get().boardCollectionRef(["cards"]));
+      const snapCards: Snapshot = {};
 
-    snapshotCards.forEach((card) => {
-      if (card.exists()) snapCards[card.id] = card.data();
-    });
+      snapshotCards.forEach((card) => {
+        if (card.exists()) snapCards[card.id] = card.data();
+      });
 
-    set({ cards: snapCards as Cards });
+      set({ cards: snapCards as Cards });
+    } catch (error) {
+      console.error("Error fetching cards:", error);
+      set({ status: 500 });
+    }
   },
 
-  initializeBoard: (ownerID: string, boardID: string, userID: string) => {
-    if (!ownerID || !boardID) return set({ status: 404 });
+  initializeBoard: async (ownerID: string, boardID: string, userID: string) => {
+    if (!ownerID || !boardID) {
+      set({ status: 404 });
+      return;
+    }
+    if (get().isLoading) return;
+
     set({
+      isLoading: true,
       ownerID,
       boardID,
       userID,
       path: `users/${ownerID}/boards/${boardID}`,
+      status: 0, // Reset status before fetching
     });
-    get().fetchBoard();
-    get().fetchCards();
-    get().fetchColumns();
+
+    try {
+      await Promise.all([
+        get().fetchBoard(),
+        get().fetchCards(),
+        get().fetchColumns(),
+      ]);
+    } catch (error) {
+      console.error("Error initializing board:", error);
+      set({ status: 500 });
+    } finally {
+      set({ isLoading: false });
+    }
   },
 
   DragAndDrop: (event: DragEndEvent) => {
@@ -232,9 +270,7 @@ const useBoardStore = create<Store>((set, get) => ({
     const activeData = active.data.current as DragData | undefined;
     const overData = over.data.current as DragData | undefined;
 
-    // If over.id is the column id itself (empty column case)
     const overColumnId = overData?.columnId || (over.id as string);
-    // Get the actual column id for the active item
     const activeColumnId = activeData?.columnId;
 
     if (!activeColumnId || !overColumnId) return;
@@ -247,7 +283,7 @@ const useBoardStore = create<Store>((set, get) => ({
         const oldIndex = newCards.indexOf(active.id as string);
         const newIndex =
           over.id === overColumnId
-            ? newCards.length // If dropping on the column itself, move to end
+            ? newCards.length
             : newCards.indexOf(over.id as string);
 
         newCards.splice(oldIndex, 1);
@@ -277,7 +313,6 @@ const useBoardStore = create<Store>((set, get) => ({
 
         const oldIndex = sourceCards.indexOf(active.id as string);
 
-        // If dropping directly on the column, add to the end
         const newIndex =
           over.id === overColumnId
             ? destCards.length

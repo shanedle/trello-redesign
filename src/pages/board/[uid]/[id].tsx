@@ -70,15 +70,22 @@ const Board = () => {
   );
 
   useEffect(() => {
-    if (router.isReady) {
+    if (router.isReady && !board.isLoading) {
       board.initializeBoard(uid as string, id as string, user?.uid || "");
     }
-    return () => board.setStatus(0);
-  }, [router]);
+  }, [router.isReady, uid, id, user?.uid]); // Remove board from dependencies
 
   useEffect(() => {
-    if (board.status > 200) router.push("/" + board.status);
-  }, [board.status]);
+    const status = board.status;
+    if (status > 200) {
+      router.push(`/${status}`);
+    }
+    return () => {
+      if (status > 200) {
+        board.setStatus(0);
+      }
+    };
+  }, [board.status, router]);
 
   if (board.status === 200)
     return (

@@ -5,9 +5,7 @@ import dayjs from "dayjs";
 import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
 
 import Layout from "@/components/layouts/layout-screen";
-
 import ProtectedRoute from "@/components/protected-route/protected-route";
-
 import { database } from "@/lib/firebase";
 import { useAuth } from "@/lib/use-auth";
 
@@ -19,14 +17,13 @@ interface FormState {
 
 const Create = () => {
   const { user } = useAuth();
-
-  if (!user) return null;
-
   const router = useRouter();
   const [form, updateForm] = useReducer(
     (prev: FormState, next: Partial<FormState>) => ({ ...prev, ...next }),
     { name: "", description: "", public: true }
   );
+
+  if (!user) return null;
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
