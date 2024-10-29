@@ -6,7 +6,7 @@ import { AuthProvider } from "@/lib/use-auth";
 import "@/styles/globals.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-function MyApp({ Component, pageProps }: AppProps) {
+const MyApp = ({ Component, pageProps }: AppProps) => {
   return (
     <>
       <Head>
@@ -20,6 +20,6 @@ function MyApp({ Component, pageProps }: AppProps) {
       </AuthProvider>
     </>
   );
-}
+};
 
 export default MyApp;
