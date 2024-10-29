@@ -56,6 +56,29 @@ body {
     @apply mt-2 text-primary-500;
   }
 
+  .auth-form-divider {
+    @apply relative my-5 text-center;
+  }
+  .auth-form-divider::before,
+  .auth-form-divider::after {
+    @apply absolute top-1/2 h-px w-[45%] bg-gray-200 content-[''];
+  }
+  .auth-form-divider::before {
+    @apply left-0;
+  }
+  .auth-form-divider::after {
+    @apply right-0;
+  }
+  .auth-form-divider span {
+    @apply bg-white px-2 text-gray-500;
+  }
+  .google-btn {
+    @apply flex items-center justify-center gap-3 !bg-white !text-gray-600 border border-gray-200 hover:!bg-gray-50;
+  }
+  .google-btn i {
+    @apply text-xl;
+  }
+
   .board-menu-btn {
     @apply flex w-full items-center justify-start gap-3 rounded px-3 py-2 hover:bg-gray-200 disabled:text-gray-500 disabled:hover:bg-inherit disabled:hover:text-gray-500;
   }

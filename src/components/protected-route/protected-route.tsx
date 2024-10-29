@@ -9,7 +9,6 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
 
   useEffect(() => {
-    // After mounting, we have access to the window
     setIsClient(true);
   }, []);
 

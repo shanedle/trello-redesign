@@ -1,16 +1,12 @@
 import { FormEvent, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-
 import Layout from "@/components/layouts/layout-screen";
-
 import { useAuth } from "@/lib/use-auth";
 
 const Login = () => {
   const router = useRouter();
-
-  const { user, signIn, loading } = useAuth();
-
+  const { user, signIn, signInWithGoogle, loading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -23,6 +19,10 @@ const Login = () => {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     await signIn(email, password);
+  };
+
+  const handleGoogleSignIn = async () => {
+    await signInWithGoogle();
   };
 
   return (
@@ -54,8 +54,22 @@ const Login = () => {
             {!loading ? "Sign In" : <p className="bi bi-arrow-clockwise"></p>}
           </button>
 
-          <Link href={"/register"}>
-            <a className="auth-form-link">Sign up for an account</a>
+          <div className="auth-form-divider">
+            <span>or</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleGoogleSignIn}
+            className="auth-form-btn google-btn"
+            disabled={loading}
+          >
+            <i className="bi bi-google"></i>
+            Continue with Google
+          </button>
+
+          <Link href={"/register"} className="auth-form-link">
+            Sign up for an account
           </Link>
         </form>
       </main>

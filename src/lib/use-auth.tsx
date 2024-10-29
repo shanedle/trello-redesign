@@ -10,6 +10,8 @@ import {
   createUserWithEmailAndPassword,
   updateProfile,
   User,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 
@@ -18,6 +20,7 @@ interface Context {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (name: string, email: string, password: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   signOut: () => void;
 }
 
@@ -46,9 +49,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (currentUser) {
         await updateProfile(currentUser, { displayName: name });
       }
-      setLoading(false);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signInWithGoogle = async () => {
+    setLoading(true);
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+    } catch (error) {
+      console.error(error);
+    } finally {
       setLoading(false);
     }
   };
@@ -56,7 +71,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = () => auth.signOut();
 
   useEffect(() => {
-    // Check that the window object is defined to make sure this code runs on the client side
     if (typeof window !== "undefined") {
       const unsubscribe = auth.onAuthStateChanged((user: User | null) => {
         setUser(user);
@@ -64,7 +78,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
       return unsubscribe;
     }
-    // If window is undefined, do nothing
     return () => {};
   }, []);
 
@@ -73,6 +86,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     loading,
     signIn,
     signUp,
+    signInWithGoogle,
     signOut,
   };
   return (

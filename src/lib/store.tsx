@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { DropResult } from "react-beautiful-dnd";
+import type { DragEndEvent } from "@dnd-kit/core";
 import {
   collection,
   DocumentReference,
@@ -11,14 +11,18 @@ import {
   setDoc,
   updateDoc,
   Query,
+  FieldValue,
 } from "firebase/firestore";
 import { uuidv4 as uuid } from "@firebase/util";
 
 import { database } from "@/lib/firebase";
+import { Cards, Columns, Builder, Board, Snapshot } from "@/types/interfaces";
 
-import { Cards, Columns, Board, Snapshot, Builder } from "@/types/interfaces";
+type DragData = {
+  columnId: string;
+};
 
-interface Store {
+type State = {
   path: string;
   order: string[];
   cards: Cards;
@@ -26,32 +30,30 @@ interface Store {
   columns: Columns;
   builder: Builder;
   status: number;
-
   ownerID: string;
   boardID: string;
   userID: string | null;
+};
 
+type Actions = {
   boardDocRef: (pathSegments?: string[]) => DocumentReference;
   boardCollectionRef: (pathSegments?: string[]) => Query<DocumentData>;
-
-  updateBuilder: (payload: any) => void;
+  updateBuilder: (payload: Partial<Builder>) => void;
   setStatus: (payload: number) => void;
-
   addCard: (column: string) => void;
   editCard: (id: string, name: string) => void;
   deleteCard: (columnID: string, ID: string) => void;
   deleteAllColumnCards: (columnID: string) => void;
-
-  updateBoard: (payload: any) => void;
+  updateBoard: (payload: Partial<Board>) => void;
   deleteBoard: () => void;
-
-  fetchBoard: () => void;
-  fetchCards: () => void;
-  fetchColumns: () => void;
+  fetchBoard: () => Promise<void>;
+  fetchCards: () => Promise<void>;
+  fetchColumns: () => Promise<void>;
   initializeBoard: (ownerID: string, boardID: string, userID: string) => void;
+  DragAndDrop: (event: DragEndEvent) => void;
+};
 
-  DragAndDrop: (result: DropResult) => void;
-}
+type Store = State & Actions;
 
 const useBoardStore = create<Store>((set, get) => ({
   path: "",
@@ -61,13 +63,13 @@ const useBoardStore = create<Store>((set, get) => ({
   columns: {},
   builder: {},
   status: 0,
-
   ownerID: "",
   boardID: "",
   userID: null,
 
   boardDocRef: (pathSegments?: string[]) =>
     doc(database, get().path, ...(pathSegments?.length ? pathSegments : [])),
+
   boardCollectionRef: (pathSegments?: string[]) =>
     collection(
       database,
@@ -75,8 +77,20 @@ const useBoardStore = create<Store>((set, get) => ({
       ...(pathSegments?.length ? pathSegments : [])
     ),
 
-  updateBuilder: (payload: any) =>
-    set((state) => ({ builder: { ...state.builder, ...payload } })),
+  updateBuilder: (payload: Partial<Builder>) =>
+    set((state) => {
+      const newBuilder = { ...state.builder };
+      Object.keys(payload).forEach((key) => {
+        if (payload[key]) {
+          newBuilder[key] = {
+            state: payload[key]?.state ?? false,
+            value: payload[key]?.value ?? "",
+          };
+        }
+      });
+      return { ...state, builder: newBuilder };
+    }),
+
   setStatus: (payload: number) => set({ status: payload }),
 
   addCard: (column: string) => {
@@ -92,7 +106,9 @@ const useBoardStore = create<Store>((set, get) => ({
         [column]: { ...get().columns[column], cards: columnCards },
       },
     });
-    updateDoc(get().boardDocRef(["columns", column]), { cards: columnCards });
+    updateDoc(get().boardDocRef(["columns", column]), {
+      cards: columnCards as unknown as FieldValue[],
+    });
     setDoc(get().boardDocRef(["cards", id]), card[id]);
     get().updateBuilder({ [column]: { state: false, value: "" } });
   },
@@ -104,13 +120,13 @@ const useBoardStore = create<Store>((set, get) => ({
     updateDoc(get().boardDocRef(["cards", id]), { name: name });
   },
 
-  deleteCard: async (columnID: string, cardID: string) => {
+  deleteCard: async (columnID: string, ID: string) => {
     const columnCards = get().columns[columnID].cards.filter(
-      (card) => card !== cardID
+      (card) => card !== ID
     );
-    await deleteDoc(get().boardDocRef(["cards", cardID]));
+    await deleteDoc(get().boardDocRef(["cards", ID]));
     await updateDoc(get().boardDocRef(["columns", columnID]), {
-      cards: columnCards,
+      cards: columnCards as unknown as FieldValue[],
     });
 
     set((state) => ({
@@ -123,9 +139,10 @@ const useBoardStore = create<Store>((set, get) => ({
       },
     }));
   },
+
   deleteAllColumnCards: async (columnID: string) => {
-    const cards = get().cards;
-    const columnCards = get().columns[columnID].cards;
+    const cards = { ...get().cards };
+    const columnCards = [...get().columns[columnID].cards];
     await updateDoc(get().boardDocRef(["columns", columnID]), { cards: [] });
     columnCards.forEach((cardID) => {
       deleteDoc(get().boardDocRef(["cards", cardID]));
@@ -143,14 +160,14 @@ const useBoardStore = create<Store>((set, get) => ({
     }));
   },
 
-  updateBoard: async (payload: any) => {
-    if (get()?.userID !== get().ownerID) return;
+  updateBoard: async (payload: Partial<Board>) => {
+    if (get().userID !== get().ownerID) return;
     await updateDoc(get().boardDocRef(), payload);
-    set({ board: payload });
+    set({ board: { ...get().board, ...payload } as Board });
   },
 
   deleteBoard: async () => {
-    if (get()?.userID !== get().ownerID) return;
+    if (get().userID !== get().ownerID) return;
     await deleteDoc(get().boardDocRef());
   },
 
@@ -207,55 +224,95 @@ const useBoardStore = create<Store>((set, get) => ({
     get().fetchColumns();
   },
 
-  DragAndDrop: (result: DropResult) => {
-    if (!result.destination) return;
-    const { source, destination } = result;
+  DragAndDrop: (event: DragEndEvent) => {
+    const { active, over } = event;
 
-    if (source.droppableId === destination.droppableId) {
-      const sourceCards = [...get().columns[source.droppableId].cards];
-      sourceCards.splice(source.index, 1);
-      sourceCards.splice(destination.index, 0, result.draggableId);
-      set((state) => ({
-        columns: {
-          ...state.columns,
-          [source.droppableId]: {
-            ...state.columns[source.droppableId],
-            cards: sourceCards,
+    if (!over) return;
+
+    const activeData = active.data.current as DragData | undefined;
+    const overData = over.data.current as DragData | undefined;
+
+    // If over.id is the column id itself (empty column case)
+    const overColumnId = overData?.columnId || (over.id as string);
+    // Get the actual column id for the active item
+    const activeColumnId = activeData?.columnId;
+
+    if (!activeColumnId || !overColumnId) return;
+
+    try {
+      if (activeColumnId === overColumnId) {
+        // Same column
+        const column = get().columns[activeColumnId];
+        const newCards = Array.from(column.cards);
+        const oldIndex = newCards.indexOf(active.id as string);
+        const newIndex =
+          over.id === overColumnId
+            ? newCards.length // If dropping on the column itself, move to end
+            : newCards.indexOf(over.id as string);
+
+        newCards.splice(oldIndex, 1);
+        newCards.splice(newIndex, 0, active.id as string);
+
+        const newColumn = {
+          ...column,
+          cards: newCards,
+        };
+
+        set((state) => ({
+          columns: {
+            ...state.columns,
+            [activeColumnId]: newColumn,
           },
-        },
-      }));
+        }));
 
-      updateDoc(get().boardDocRef(["columns", source.droppableId]), {
-        cards: sourceCards,
-      });
-    } else {
-      const sourceCards = [...get().columns[source.droppableId].cards];
-      const destinationCards = [
-        ...get().columns[destination.droppableId].cards,
-      ];
+        updateDoc(get().boardDocRef(["columns", activeColumnId]), {
+          cards: newCards as unknown as FieldValue[],
+        });
+      } else {
+        // Different columns
+        const sourceColumn = get().columns[activeColumnId];
+        const destColumn = get().columns[overColumnId];
+        const sourceCards = Array.from(sourceColumn.cards);
+        const destCards = Array.from(destColumn.cards);
 
-      sourceCards.splice(source.index, 1);
-      destinationCards.splice(destination.index, 0, result.draggableId);
-      set((state) => ({
-        columns: {
-          ...state.columns,
-          [source.droppableId]: {
-            ...state.columns[source.droppableId],
-            cards: sourceCards,
+        const oldIndex = sourceCards.indexOf(active.id as string);
+
+        // If dropping directly on the column, add to the end
+        const newIndex =
+          over.id === overColumnId
+            ? destCards.length
+            : destCards.indexOf(over.id as string);
+
+        sourceCards.splice(oldIndex, 1);
+        destCards.splice(
+          newIndex >= 0 ? newIndex : destCards.length,
+          0,
+          active.id as string
+        );
+
+        set((state) => ({
+          columns: {
+            ...state.columns,
+            [activeColumnId]: {
+              ...sourceColumn,
+              cards: sourceCards,
+            },
+            [overColumnId]: {
+              ...destColumn,
+              cards: destCards,
+            },
           },
-          [destination.droppableId]: {
-            ...state.columns[destination.droppableId],
-            cards: destinationCards,
-          },
-        },
-      }));
+        }));
 
-      updateDoc(get().boardDocRef(["columns", source.droppableId]), {
-        cards: sourceCards,
-      });
-      updateDoc(get().boardDocRef(["columns", destination.droppableId]), {
-        cards: destinationCards,
-      });
+        updateDoc(get().boardDocRef(["columns", activeColumnId]), {
+          cards: sourceCards as unknown as FieldValue[],
+        });
+        updateDoc(get().boardDocRef(["columns", overColumnId]), {
+          cards: destCards as unknown as FieldValue[],
+        });
+      }
+    } catch (error) {
+      console.error("Error in DragAndDrop:", error);
     }
   },
 }));
