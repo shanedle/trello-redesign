@@ -1,59 +1,61 @@
 import { useRouter } from "next/router";
-import { Dispatch, SetStateAction } from "react";
 
-import Modal from "@/components/modals/modal";
+import Modal from "./modal";
 
 import useBoardStore from "@/lib/store";
 
-const ModalBoardDelete = ({
-  state,
-  setState,
-}: {
-  state: string;
-  setState: Dispatch<SetStateAction<string>>;
-}) => {
+interface DeleteBoardModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const DeleteBoardModal = ({ isOpen, onClose }: DeleteBoardModalProps) => {
   const deleteBoard = useBoardStore((state) => state.deleteBoard);
   const router = useRouter();
 
-  if (state !== "delete") return null;
-  else
-    return (
-      <Modal>
-        <div className="w-full max-w-md space-y-5 rounded-lg bg-white p-6 shadow-md md:max-w-lg ">
-          <header className=" flex w-full items-center justify-between">
-            <p className="text-xl font-medium">
-              Are you sure you want to delete this board?
-            </p>
-            <button onClick={() => setState("")} className="bi bi-x-lg" />
-          </header>
+  const handleDelete = async () => {
+    await deleteBoard();
+    router.push("/board");
+    onClose();
+  };
 
-          <p className="text-justify text-base md:text-lg">
-            This action is irreversible, and all associated data will be
-            permanently removed.
-          </p>
+  return (
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <div className="w-full max-w-md space-y-5 rounded-lg bg-white p-6 shadow-md md:max-w-lg">
+        <header className="flex w-full items-center justify-between">
+          <h2 className="text-xl font-medium">
+            Are you sure you want to delete this board?
+          </h2>
+          <button
+            onClick={onClose}
+            className="bi bi-x-lg hover:opacity-70"
+            aria-label="Close modal"
+          />
+        </header>
 
-          <div className=" flex w-full items-center justify-end gap-3">
-            <button
-              onClick={() => setState("")}
-              type="button"
-              className="btn border-2 border-black bg-white text-black hover:bg-gray-100"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={() => {
-                deleteBoard();
-                router.push("/board");
-              }}
-              type="submit"
-              className="btn border-2 border-red-600 bg-red-600 text-white hover:border-red-700 hover:bg-red-700"
-            >
-              Delete
-            </button>
-          </div>
+        <p className="text-justify text-base md:text-lg">
+          This action is irreversible, and all associated data will be
+          permanently removed.
+        </p>
+
+        <div className="flex w-full items-center justify-end gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            className="btn border-2 border-black bg-white text-black hover:bg-gray-100"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleDelete}
+            className="btn border-2 border-red-600 bg-red-600 text-white hover:border-red-700 hover:bg-red-700"
+          >
+            Delete
+          </button>
         </div>
-      </Modal>
-    );
+      </div>
+    </Modal>
+  );
 };
 
-export default ModalBoardDelete;
+export default DeleteBoardModal;

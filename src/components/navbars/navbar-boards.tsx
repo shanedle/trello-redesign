@@ -1,18 +1,18 @@
-import Link from "next/link";
 import { useState } from "react";
+import Link from "next/link";
 
 import ModalBoardSettings from "@/components/modals/modal-board-settings";
-import ModalBoardDelete from "@/components/modals/modal-delete-board";
+import DeleteBoardModal from "@/components/modals/modal-delete-board";
 
 import useBoardStore from "@/lib/store";
 import { useAuth } from "@/lib/use-auth";
 
+type ModalType = "" | "settings" | "delete";
+
 const Navbar = () => {
   const { user, signOut } = useAuth();
-
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
-  const [modalType, setModalType] = useState<string>("");
-
+  const [modalType, setModalType] = useState<ModalType>("");
   const board = useBoardStore((state) => state.board);
   const ownerID = useBoardStore((state) => state.ownerID);
 
@@ -24,8 +24,12 @@ const Navbar = () => {
     setMenuOpen((prevMenuOpen) => !prevMenuOpen);
   };
 
-  const openModal = (type: string): void => {
+  const openModal = (type: ModalType): void => {
     setModalType(type);
+  };
+
+  const closeModal = (): void => {
+    setModalType("");
   };
 
   return (
@@ -33,7 +37,7 @@ const Navbar = () => {
       <nav className="container mx-auto flex items-center justify-between p-2 py-5 text-lg sm:p-5">
         <section className="flex items-center gap-4 sm:gap-8">
           {user && (
-            <Link href={"/board"}>
+            <Link href="/board">
               <button className="bi bi-chevron-left" />
             </Link>
           )}
@@ -44,8 +48,14 @@ const Navbar = () => {
           </div>
         </section>
 
-        <ModalBoardSettings state={modalType} setState={setModalType} />
-        <ModalBoardDelete state={modalType} setState={setModalType} />
+        <ModalBoardSettings
+          isOpen={modalType === "settings"}
+          onClose={closeModal}
+        />
+        <DeleteBoardModal
+          isOpen={modalType === "delete"}
+          onClose={closeModal}
+        />
 
         {user && (
           <div

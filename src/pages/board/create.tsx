@@ -6,6 +6,7 @@ import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
 
 import Layout from "@/components/layouts/layout-screen";
 import ProtectedRoute from "@/components/protected-route/protected-route";
+
 import { database } from "@/lib/firebase";
 import { useAuth } from "@/lib/use-auth";
 

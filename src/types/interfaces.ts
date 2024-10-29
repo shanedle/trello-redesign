@@ -25,10 +25,19 @@ export interface Snapshot {
 }
 
 export interface Board {
-  id?: string;
-  order: string[];
+  id: string;
   name: string;
   description: string;
-  createdAt: string;
   public: boolean;
+  order: string[];
+  createdAt: string;
+}
+
+export interface SearchBarProps {
+  search: string;
+  setSearch: (text: string) => void;
+}
+
+export interface NavbarProps {
+  className?: string;
 }

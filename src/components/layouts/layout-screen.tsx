@@ -1,14 +1,13 @@
 import { ReactNode } from "react";
 
-import Navbar from "@/components/navbars/navbar-regular";
+import BaseLayout from "./base-layout";
 
-const Layout = ({ children }: { children: ReactNode }) => {
+const LayoutScreen = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="absolute inset-0 flex flex-col overflow-hidden">
-      <Navbar />
+    <BaseLayout className="absolute inset-0 flex flex-col overflow-hidden">
       {children}
-    </div>
+    </BaseLayout>
   );
 };
 
-export default Layout;
+export default LayoutScreen;

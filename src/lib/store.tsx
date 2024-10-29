@@ -16,6 +16,7 @@ import {
 import { uuidv4 as uuid } from "@firebase/util";
 
 import { database } from "@/lib/firebase";
+
 import { Cards, Columns, Builder, Board, Snapshot } from "@/types/interfaces";
 
 type DragData = {
@@ -168,8 +169,16 @@ const useBoardStore = create<Store>((set, get) => ({
 
   updateBoard: async (payload: Partial<Board>) => {
     if (get().userID !== get().ownerID) return;
-    await updateDoc(get().boardDocRef(), payload);
-    set({ board: { ...get().board, ...payload } as Board });
+
+    // Filter out undefined values
+    const cleanPayload = Object.fromEntries(
+      Object.entries(payload).filter(([_, value]) => value !== undefined)
+    );
+
+    if (Object.keys(cleanPayload).length > 0) {
+      await updateDoc(get().boardDocRef(), cleanPayload);
+      set({ board: { ...get().board, ...cleanPayload } as Board });
+    }
   },
 
   deleteBoard: async () => {
